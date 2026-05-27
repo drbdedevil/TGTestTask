@@ -4,4 +4,4 @@ set(SOURCE_FILES
 
 )
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp String.cpp String.h)
