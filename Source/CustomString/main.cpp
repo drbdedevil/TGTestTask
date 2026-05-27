@@ -5,6 +5,8 @@
 int main()
 {
 	String exampleString("Hello, world!");
+	String exampleString1 = "Some string";
+	exampleString = std::move(exampleString1);
 
 	std::cout << exampleString << std::endl;
 
@@ -15,7 +17,7 @@ int main()
 		std::cout << *ch << std::endl;
 	}
 
-	exampleString.reserve(200);
+	exampleString1.reserve(200);
 
 	return 0;
 }

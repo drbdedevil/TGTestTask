@@ -6,12 +6,18 @@ class String
 {
 public:
 	String(const char* str = "");
-	~String();
+	String(const String& other);
+	String(String&& other) noexcept;
+	~String() noexcept;
 
 	void reserve(size_t new_capacity);
 
-	const char* c_str() const;
+	const char* c_str() const noexcept;
 
+	String& operator=(const String& other);
+	String& operator=(String&& other) noexcept;
+
+	void swap(String& other) noexcept;
 private:
 	char* data;
 	size_t size;
@@ -20,7 +26,7 @@ private:
 	static constexpr size_t MIN_CAPACITY = 32;
 
 	// TODO: удалить
-	void printCapacity();
+	void printInfo();
 };
 
 inline std::ostream& operator<<(std::ostream& os, const String& str)
