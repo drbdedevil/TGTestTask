@@ -1,23 +1,47 @@
+#include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include "String.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-	String exampleString("Hello, world!");
-	String exampleString1 = "Some string";
-	exampleString = std::move(exampleString1);
-
-	std::cout << exampleString << std::endl;
-
-	const char* ch = exampleString.c_str();
-	while (*ch != '\0')
+	if (argc < 2)
 	{
-		ch = ch + 1;
-		std::cout << *ch << std::endl;
+		std::cerr << "Error: Need to pass arguments - " << argv[0] << " <string1> <string2> ..." << std::endl;
+		return 1;
 	}
 
-	exampleString1.reserve(200);
+	std::vector<String> argStrings;
+	for (size_t i = 1; i < argc; ++i)
+	{
+		argStrings.push_back(String(argv[i]));
+	}
+
+	auto comparator = [](const String& lhs, const String& rhs)
+		{
+			const char* pLhs = lhs.c_str();
+			const char* pRhs = rhs.c_str();
+
+			while (*pLhs && *pRhs)
+			{
+				if (std::tolower(*pLhs) != std::tolower(*pRhs))
+				{
+					return std::tolower(*pLhs) > std::tolower(*pRhs);
+				}
+				++pLhs; ++pRhs;
+			}
+
+			return std::tolower(*pLhs) > std::tolower(*pRhs);
+		};
+
+	std::sort(argStrings.begin(), argStrings.end(), comparator);
+
+	std::cout << "\nResult:" << std::endl;
+	for (size_t i = 0; i < argStrings.size(); ++i)
+	{
+		std::cout << argStrings[i] << std::endl;
+	}
 
 	return 0;
 }

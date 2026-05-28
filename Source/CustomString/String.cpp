@@ -20,7 +20,7 @@ String::String(const char* str)
 	std::memcpy(data, str, size + 1);
 
 	// TODO: удалить
-	printInfo();
+	// printInfo();
 }
 
 String::String(const String& other) : size(other.size), capacity(other.capacity)
@@ -54,7 +54,7 @@ void String::reserve(size_t new_capacity)
 	capacity = new_capacity;
 
 	// TODO: удалить
-	printInfo();
+	// printInfo();
 }
 
 const char* String::c_str() const noexcept
@@ -81,6 +81,48 @@ String& String::operator=(String&& other) noexcept
 	swap(other);
 
 	return *this;
+}
+
+String& String::operator+=(const char* other)
+{
+	if (!other || other[0] == '\0')
+		return *this;
+
+	const size_t other_size = std::strlen(other);
+	const size_t required_size = size + other_size + 1;
+	if (capacity < required_size)
+	{
+		capacity = required_size + required_size / 2 + 1;
+		char* new_data = new char[capacity];
+
+		std::memmove(new_data, data, size + 1);
+		std::memmove(new_data + size, other, other_size + 1);
+
+		delete[] data;
+		data = new_data;
+	}
+	else
+	{
+		std::memmove(data + size, other, other_size + 1);
+	}
+	size += other_size;
+	
+	return *this;
+}
+
+String& String::operator+=(const String& other)
+{
+	return *this += other.c_str();
+}
+
+bool String::empty() const
+{
+	return size == 0;
+}
+
+size_t String::length() const
+{
+	return size;
 }
 
 void String::swap(String& other) noexcept
