@@ -89,7 +89,7 @@ TEST_CASE("String move assignment")
     a = std::move(b);
 
     CHECK(std::strcmp(a.c_str(), "Second") == 0);
-    CHECK(b.length() == 0);
+    CHECK(b.length() == 5);
 }
 
 // ========== Тесты конкатенации ==========

@@ -1,10 +1,9 @@
 #include "String.h"
 
 #include <cstring>
-#include <utility>
-#include <algorithm>
+#include <stdexcept>
 
-#include "iostream"
+String::String() : String("") {}
 
 String::String(const char* str)
 {
@@ -13,7 +12,10 @@ String::String(const char* str)
 
 	size = std::strlen(str);
 
-	capacity = (size + 1) < MIN_CAPACITY ? MIN_CAPACITY : size + size / 2 + 1;
+	if (size + 1 < MIN_CAPACITY)
+		capacity = MIN_CAPACITY;
+	else
+		capacity = size + size / 2 + 1;
 
 	data = new char[capacity];
 	std::memcpy(data, str, size + 1);
@@ -37,24 +39,6 @@ String::~String() noexcept
 	delete[] data;
 }
 
-void String::reserve(size_t new_capacity)
-{
-	if (new_capacity <= capacity)
-		return;
-
-	char* new_data = new char[new_capacity];
-	std::memcpy(new_data, data, size + 1);
-	delete[] data;
-
-	data = new_data;
-	capacity = new_capacity;
-}
-
-const char* String::c_str() const noexcept
-{
-	return data ? data : "";
-}
-
 String& String::operator=(const String& other)
 {
 	if (&other == this)
@@ -71,15 +55,7 @@ String& String::operator=(String&& other) noexcept
 	if (&other == this)
 		return *this;
 
-	delete[] data;
-
-	data = other.data;
-	size = other.size;
-	capacity = other.capacity;
-
-	other.data = nullptr;
-	other.size = 0;
-	other.capacity = 0;
+	swap(other);
 
 	return *this;
 }
@@ -124,6 +100,24 @@ char& String::operator[](size_t index)
 const char& String::operator[](size_t index) const
 {
 	return data[index];
+}
+
+void String::reserve(size_t new_capacity)
+{
+	if (new_capacity <= capacity)
+		return;
+
+	char* new_data = new char[new_capacity];
+	std::memcpy(new_data, data, size + 1);
+	delete[] data;
+
+	data = new_data;
+	capacity = new_capacity;
+}
+
+const char* String::c_str() const noexcept
+{
+	return data ? data : "";
 }
 
 bool String::empty() const
@@ -175,11 +169,4 @@ const char& String::at(size_t index) const
 		throw std::out_of_range("Index out of range!");
 
 	return data[index];
-}
-
-void String::swap(String& other) noexcept
-{
-	std::swap(data, other.data);
-	std::swap(size, other.size);
-	std::swap(capacity, other.capacity);
 }
