@@ -3,170 +3,185 @@
 #include <cstring>
 #include <stdexcept>
 
+namespace exstr
+{
+
 String::String() : String("") {}
 
 String::String(const char* str)
 {
-	if (!str)
-		str = "";
+    if (!str) str = "";
 
-	size = std::strlen(str);
+    size_ = std::strlen(str);
 
-	if (size + 1 < MIN_CAPACITY)
-		capacity = MIN_CAPACITY;
-	else
-		capacity = size + size / 2 + 1;
+    if (size_ + 1 < MIN_CAPACITY)
+        capacity_ = MIN_CAPACITY;
+    else
+        capacity_ = size_ + size_ / 2 + 1;
 
-	data = new char[capacity];
-	std::memcpy(data, str, size + 1);
+    data_ = new char[capacity_];
+    std::memcpy(data_, str, size_ + 1);
 }
 
-String::String(const String& other) : size(other.size), capacity(other.capacity)
+String::String(const String& other) : size_(other.size_), capacity_(other.capacity_)
 {
-	data = new char[capacity];
-	std::memcpy(data, other.data, other.size + 1);
+    data_ = new char[capacity_];
+    std::memcpy(data_, other.data_, other.size_ + 1);
 }
 
-String::String(String&& other) noexcept : data(other.data), size(other.size), capacity(other.capacity)
+String::String(String&& other) noexcept : data_(other.data_), size_(other.size_), capacity_(other.capacity_)
 {
-	other.data = nullptr;
-	other.size = 0;
-	other.capacity = 0;
+    other.data_ = nullptr;
+    other.size_ = 0;
+    other.capacity_ = 0;
 }
 
 String::~String() noexcept
 {
-	delete[] data;
+    delete[] data_;
 }
 
 String& String::operator=(const String& other)
 {
-	if (&other == this)
-		return *this;
+    if (&other == this) return *this;
 
-	String tempString(other);
-	swap(tempString);
-	
-	return *this;
+    String tempString(other);
+    swap(tempString);
+
+    return *this;
 }
 
 String& String::operator=(String&& other) noexcept
 {
-	if (&other == this)
-		return *this;
+    if (&other == this) return *this;
 
-	swap(other);
+    swap(other);
 
-	return *this;
+    return *this;
 }
 
 String& String::operator+=(const char* other)
 {
-	if (!other || other[0] == '\0')
-		return *this;
+    if (!other || other[0] == '\0') return *this;
 
-	const size_t other_size = std::strlen(other);
-	const size_t required_size = size + other_size + 1;
-	if (capacity < required_size)
-	{
-		capacity = required_size + required_size / 2 + 1;
-		char* new_data = new char[capacity];
+    const size_t other_size = std::strlen(other);
+    const size_t required_size = size_ + other_size + 1;
+    if (capacity_ < required_size)
+    {
+        capacity_ = required_size + required_size / 2 + 1;
+        char* new_data = new char[capacity_];
 
-		std::memmove(new_data, data, size + 1);
-		std::memmove(new_data + size, other, other_size + 1);
+        std::memcpy(new_data, data_, size_);
+        std::memcpy(new_data + size_, other, other_size + 1);
 
-		delete[] data;
-		data = new_data;
-	}
-	else
-	{
-		std::memmove(data + size, other, other_size + 1);
-	}
-	size += other_size;
-	
-	return *this;
+        delete[] data_;
+        data_ = new_data;
+    }
+    else
+    {
+        // ƒолжно произойти перекрытие нуль-терминатора, поэтому используем более безопасный
+        // в таком случае memmove вместо memcpy.
+        std::memmove(data_ + size_, other, other_size + 1);
+    }
+    size_ += other_size;
+
+    return *this;
 }
 
 String& String::operator+=(const String& other)
 {
-	return *this += other.c_str();
+    return *this += other.c_str();
 }
 
 char& String::operator[](size_t index)
 {
-	return data[index];
+    return data_[index];
 }
 
 const char& String::operator[](size_t index) const
 {
-	return data[index];
+    return data_[index];
 }
 
 void String::reserve(size_t new_capacity)
 {
-	if (new_capacity <= capacity)
-		return;
+    if (new_capacity <= capacity_) return;
 
-	char* new_data = new char[new_capacity];
-	std::memcpy(new_data, data, size + 1);
-	delete[] data;
+    char* new_data = new char[new_capacity];
+    std::memcpy(new_data, data_, size_ + 1);
+    delete[] data_;
 
-	data = new_data;
-	capacity = new_capacity;
+    data_ = new_data;
+    capacity_ = new_capacity;
 }
 
 const char* String::c_str() const noexcept
 {
-	return data ? data : "";
+    return data_ ? data_ : "";
 }
 
 bool String::empty() const
 {
-	return size == 0;
+    return size_ == 0;
 }
 
 size_t String::length() const
 {
-	return size;
+    return size_;
 }
 
-size_t String::get_capacity() const
+size_t String::capacity() const
 {
-	return capacity;
+    return capacity_;
 }
 
 void String::shrink_to_fit()
 {
-	if (capacity == size + 1)
-		return;
+    if (capacity_ == size_ + 1) return;
 
-	capacity = size + 1;
-	char* new_data = new char[capacity];
+    capacity_ = size_ + 1;
+    char* new_data = new char[capacity_];
 
-	std::memcpy(new_data, data, size + 1);
+    std::memcpy(new_data, data_, size_ + 1);
 
-	delete[] data;
-	data = new_data;
+    delete[] data_;
+    data_ = new_data;
 }
 
 void String::clear()
 {
-	size = 0;
-	data[0] = '\0';
+    size_ = 0;
+    data_[0] = '\0';
 }
 
 char& String::at(size_t index)
 {
-	if (index >= size)
-		throw std::out_of_range("Index out of range!");
+    if (index >= size_) throw std::out_of_range("Index out of range!");
 
-	return data[index];
+    return data_[index];
 }
 
 const char& String::at(size_t index) const
 {
-	if (index >= size)
-		throw std::out_of_range("Index out of range!");
+    if (index >= size_) throw std::out_of_range("Index out of range!");
 
-	return data[index];
+    return data_[index];
 }
+
+void String::sort(bool (*ptrComparator)(char, char))
+{
+    if (size_ < 2) return;
+
+    for (size_t i = 0; i < size_; ++i)
+    {
+        for (size_t j = size_ - 1; j > i; --j)
+        {
+            if (ptrComparator(data_[j], data_[j - 1]))
+            {
+                std::swap(data_[j], data_[j - 1]);
+            }
+        }
+    }
+}
+
+}  // namespace exstr

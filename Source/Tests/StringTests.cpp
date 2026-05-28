@@ -5,36 +5,36 @@
 #include <cstring>
 
 // ========== Тесты конструкторов ==========
-TEST_CASE("String default constructor") 
+TEST_CASE("String default constructor")
 {
-    String s;
+    exstr::String s;
 
     CHECK(s.c_str() != nullptr);
     CHECK(s.length() == 0);
     CHECK(std::strcmp(s.c_str(), "") == 0);
 }
 
-TEST_CASE("String constructor from C-string") 
+TEST_CASE("String constructor from C-string")
 {
-    String s("Hello, Targem!");
+    exstr::String s("Hello, Targem!");
 
     CHECK(s.length() == 14);
     CHECK(std::strcmp(s.c_str(), "Hello, Targem!") == 0);
 }
 
-TEST_CASE("String constructor from empty C-string") 
+TEST_CASE("String constructor from empty C-string")
 {
-    String s("");
+    exstr::String s("");
 
     CHECK(s.length() == 0);
     CHECK(std::strcmp(s.c_str(), "") == 0);
 }
 
 // ========== Тесты копирования ==========
-TEST_CASE("String copy constructor") 
+TEST_CASE("String copy constructor")
 {
-    String original("Copy me");
-    String copy(original);
+    exstr::String original("Copy me");
+    exstr::String copy(original);
 
     CHECK(copy.length() == original.length());
     CHECK(std::strcmp(copy.c_str(), original.c_str()) == 0);
@@ -46,12 +46,12 @@ TEST_CASE("String copy constructor")
 }
 
 // ========== Тесты перемещения ==========
-TEST_CASE("String move constructor") 
+TEST_CASE("String move constructor")
 {
-    String source("Move me");
+    exstr::String source("Move me");
     const char* source_ptr = source.c_str();
 
-    String destination(std::move(source));
+    exstr::String destination(std::move(source));
 
     CHECK(destination.length() == 7);
     CHECK(std::strcmp(destination.c_str(), "Move me") == 0);
@@ -62,10 +62,10 @@ TEST_CASE("String move constructor")
 }
 
 // ========== Тесты операторов ==========
-TEST_CASE("String assignment operator") 
+TEST_CASE("String assignment operator")
 {
-    String a("First");
-    String b("Second");
+    exstr::String a("First");
+    exstr::String b("Second");
 
     a = b;
 
@@ -73,18 +73,18 @@ TEST_CASE("String assignment operator")
     CHECK(std::strcmp(a.c_str(), b.c_str()) == 0);
 }
 
-TEST_CASE("String self-assignment") 
+TEST_CASE("String self-assignment")
 {
-    String s("Hello");
+    exstr::String s("Hello");
     s = s;
 
     CHECK(std::strcmp(s.c_str(), "Hello") == 0);
 }
 
-TEST_CASE("String move assignment") 
+TEST_CASE("String move assignment")
 {
-    String a("First");
-    String b("Second");
+    exstr::String a("First");
+    exstr::String b("Second");
 
     a = std::move(b);
 
@@ -93,86 +93,94 @@ TEST_CASE("String move assignment")
 }
 
 // ========== Тесты конкатенации ==========
-TEST_CASE("String concatenation with C-string") 
+TEST_CASE("String concatenation with C-string")
 {
-    String s("I want to work at ");
+    exstr::String s("I want to work at ");
     s += "Targem Games!";
 
     CHECK(std::strcmp(s.c_str(), "I want to work at Targem Games!") == 0);
 }
 
-TEST_CASE("String concatenation with String") 
+TEST_CASE("String concatenation with String")
 {
-    String s1("I want to work at ");
-    String s2("Targem Games!");
+    exstr::String s1("I want to work at ");
+    exstr::String s2("Targem Games!");
     s1 += s2;
 
     CHECK(std::strcmp(s1.c_str(), "I want to work at Targem Games!") == 0);
 }
 
-TEST_CASE("String concatenation with self") 
+TEST_CASE("String concatenation by self")
 {
-    String s("VeryMuch");
-    s += s.c_str(); 
+    exstr::String s("Hello World");
+    s += s.c_str() + 6;
+
+    CHECK(std::strcmp(s.c_str(), "Hello WorldWorld") == 0);
+}
+
+TEST_CASE("String concatenation with self")
+{
+    exstr::String s("VeryMuch");
+    s += s.c_str();
 
     CHECK(std::strcmp(s.c_str(), "VeryMuchVeryMuch") == 0);
 }
 
 // ========== Тесты сравнения ==========
-TEST_CASE("String equality") 
+TEST_CASE("String equality")
 {
-    CHECK(String("Hello") == String("Hello"));
-    CHECK_FALSE(String("Hello") == String("World"));
-    CHECK(String("Hello") != String("World"));
-    CHECK(String("") == String(""));
+    CHECK(exstr::String("Hello") == exstr::String("Hello"));
+    CHECK_FALSE(exstr::String("Hello") == exstr::String("World"));
+    CHECK(exstr::String("Hello") != exstr::String("World"));
+    CHECK(exstr::String("") == exstr::String(""));
 }
 
-TEST_CASE("String comparison operators") 
+TEST_CASE("String comparison operators")
 {
-    CHECK(String("Rockstar") < String("Targem"));
-    CHECK(String("Targem") > String("Rockstar"));
-    CHECK(String("Targem") <= String("Targem"));
-    CHECK(String("Targem") >= String("Targem"));
+    CHECK(exstr::String("Rockstar") < exstr::String("Targem"));
+    CHECK(exstr::String("Targem") > exstr::String("Rockstar"));
+    CHECK(exstr::String("Targem") <= exstr::String("Targem"));
+    CHECK(exstr::String("Targem") >= exstr::String("Targem"));
 }
 
 // ========== Тесты работы с C-строками ==========
-TEST_CASE("String c_str returns null-terminated string") 
+TEST_CASE("String c_str returns null-terminated string")
 {
-    String s("Test");
+    exstr::String s("Test");
 
     const char* ptr = s.c_str();
 
     for (size_t i = 0; i < s.length(); ++i)
         CHECK(ptr[i] != '\0');
-    
+
     CHECK(ptr[s.length()] == '\0');
 }
 
 // ========== Тесты с SUBCASE ==========
-TEST_CASE("String reserve and capacity") 
+TEST_CASE("String reserve and capacity")
 {
-    String s("Hello");
+    exstr::String s("Hello");
 
-    SUBCASE("reserve increases capacity") 
+    SUBCASE("reserve increases capacity")
     {
-        size_t old_capacity = s.get_capacity();
+        size_t old_capacity = s.capacity();
         s.reserve(old_capacity + 100);
-        CHECK(s.get_capacity() >= old_capacity + 100);
+        CHECK(s.capacity() >= old_capacity + 100);
         CHECK(std::strcmp(s.c_str(), "Hello") == 0);
     }
 
-    SUBCASE("reserve smaller does nothing") 
+    SUBCASE("reserve smaller does nothing")
     {
-        size_t old_capacity = s.get_capacity();
+        size_t old_capacity = s.capacity();
         s.reserve(old_capacity - 10);
-        CHECK(s.get_capacity() == old_capacity);
+        CHECK(s.capacity() == old_capacity);
     }
 }
 
 // ========== Тесты вспомогательных методов ==========
 TEST_CASE("Clear String")
 {
-    String s("Don't delete me!");
+    exstr::String s("Don't delete me!");
     s.clear();
 
     CHECK(s.c_str() != nullptr);
@@ -182,7 +190,7 @@ TEST_CASE("Clear String")
 
 TEST_CASE("String operator[] non-const access")
 {
-    String s("Hello");
+    exstr::String s("Hello");
 
     CHECK(s[0] == 'H');
     CHECK(s[4] == 'o');
@@ -195,7 +203,7 @@ TEST_CASE("String operator[] non-const access")
     CHECK(s[4] == '!');
     CHECK(std::strcmp(s.c_str(), "Jell!") == 0);
 
-    const String s1("Hello");
+    const exstr::String s1("Hello");
 
     CHECK(s1[0] == 'H');
     CHECK(s1[4] == 'o');
@@ -203,7 +211,7 @@ TEST_CASE("String operator[] non-const access")
 
 TEST_CASE("String at() non-const access")
 {
-    String s("Hello");
+    exstr::String s("Hello");
 
     CHECK(s.at(0) == 'H');
     CHECK(s.at(4) == 'o');
@@ -212,7 +220,7 @@ TEST_CASE("String at() non-const access")
     CHECK(s.at(0) == 'J');
     CHECK(std::strcmp(s.c_str(), "Jello") == 0);
 
-    const String s1("Hello");
+    const exstr::String s1("Hello");
 
     CHECK(s1.at(0) == 'H');
     CHECK(s1.at(4) == 'o');
@@ -220,7 +228,7 @@ TEST_CASE("String at() non-const access")
 
 TEST_CASE("String at() throws on invalid index")
 {
-    String s("Hello");
+    exstr::String s("Hello");
 
     CHECK_THROWS_AS(s.at(5), std::out_of_range);
     CHECK_THROWS_AS(s.at(100), std::out_of_range);
@@ -229,13 +237,13 @@ TEST_CASE("String at() throws on invalid index")
     CHECK_NOTHROW(s.at(0));
     CHECK_NOTHROW(s.at(4));
 
-    String empty;
+    exstr::String empty;
     CHECK_THROWS_AS(empty.at(0), std::out_of_range);
 }
 
 TEST_CASE("String at() works after clear")
 {
-    String s("Hello");
+    exstr::String s("Hello");
     s.clear();
 
     CHECK(s.length() == 0);
@@ -244,8 +252,8 @@ TEST_CASE("String at() works after clear")
 
 TEST_CASE("String at() works after move")
 {
-    String source("Hello");
-    String destination(std::move(source));
+    exstr::String source("Hello");
+    exstr::String destination(std::move(source));
 
     CHECK(destination.at(0) == 'H');
     CHECK(destination.at(4) == 'o');
