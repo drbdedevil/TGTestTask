@@ -4,8 +4,7 @@
 #include <utility>
 #include <algorithm>
 
-// TODO: удалить
-#include <iostream>
+#include "iostream"
 
 String::String(const char* str)
 {
@@ -18,9 +17,6 @@ String::String(const char* str)
 
 	data = new char[capacity];
 	std::memcpy(data, str, size + 1);
-
-	// TODO: удалить
-	// printInfo();
 }
 
 String::String(const String& other) : size(other.size), capacity(other.capacity)
@@ -52,14 +48,11 @@ void String::reserve(size_t new_capacity)
 
 	data = new_data;
 	capacity = new_capacity;
-
-	// TODO: удалить
-	// printInfo();
 }
 
 const char* String::c_str() const noexcept
 {
-	return data;
+	return data ? data : "";
 }
 
 String& String::operator=(const String& other)
@@ -78,7 +71,15 @@ String& String::operator=(String&& other) noexcept
 	if (&other == this)
 		return *this;
 
-	swap(other);
+	delete[] data;
+
+	data = other.data;
+	size = other.size;
+	capacity = other.capacity;
+
+	other.data = nullptr;
+	other.size = 0;
+	other.capacity = 0;
 
 	return *this;
 }
@@ -115,6 +116,16 @@ String& String::operator+=(const String& other)
 	return *this += other.c_str();
 }
 
+char& String::operator[](size_t index)
+{
+	return data[index];
+}
+
+const char& String::operator[](size_t index) const
+{
+	return data[index];
+}
+
 bool String::empty() const
 {
 	return size == 0;
@@ -125,16 +136,50 @@ size_t String::length() const
 	return size;
 }
 
+size_t String::get_capacity() const
+{
+	return capacity;
+}
+
+void String::shrink_to_fit()
+{
+	if (capacity == size + 1)
+		return;
+
+	capacity = size + 1;
+	char* new_data = new char[capacity];
+
+	std::memcpy(new_data, data, size + 1);
+
+	delete[] data;
+	data = new_data;
+}
+
+void String::clear()
+{
+	size = 0;
+	data[0] = '\0';
+}
+
+char& String::at(size_t index)
+{
+	if (index >= size)
+		throw std::out_of_range("Index out of range!");
+
+	return data[index];
+}
+
+const char& String::at(size_t index) const
+{
+	if (index >= size)
+		throw std::out_of_range("Index out of range!");
+
+	return data[index];
+}
+
 void String::swap(String& other) noexcept
 {
 	std::swap(data, other.data);
 	std::swap(size, other.size);
 	std::swap(capacity, other.capacity);
-}
-
-void String::printInfo()
-{
-	std::cout << c_str() << std::endl;
-	std::cout << "Size = " << size << std::endl;
-	std::cout << "Capacity = " << capacity << std::endl << std::endl;
 }

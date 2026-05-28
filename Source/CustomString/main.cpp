@@ -26,9 +26,8 @@ int main(int argc, char* argv[])
 			while (*pLhs && *pRhs)
 			{
 				if (std::tolower(*pLhs) != std::tolower(*pRhs))
-				{
 					return std::tolower(*pLhs) > std::tolower(*pRhs);
-				}
+
 				++pLhs; ++pRhs;
 			}
 

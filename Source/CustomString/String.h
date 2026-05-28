@@ -20,8 +20,19 @@ public:
 	String& operator+=(const char* other);
 	String& operator+=(const String& other);
 
+	char& operator[](size_t index);
+	const char& operator[](size_t index) const;
+
 	bool empty() const;
 	size_t length() const;
+	size_t get_capacity() const;
+
+	void shrink_to_fit();
+
+	void clear();
+
+	char& at(size_t index);
+	const char& at(size_t index) const;
 
 	void swap(String& other) noexcept;
 private:
@@ -30,9 +41,6 @@ private:
 	size_t capacity;
 
 	static constexpr size_t MIN_CAPACITY = 32;
-
-	// TODO: удалить
-	void printInfo();
 };
 
 inline std::ostream& operator<<(std::ostream& os, const String& str)

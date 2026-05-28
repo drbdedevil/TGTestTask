@@ -12,6 +12,16 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message("C++ standard: ${CMAKE_CXX_STANDARD}")
 
-add_subdirectory(Source/CustomString)
+set_property(GLOBAL PROPERTY VS_FOLDER_PROPS "Files")
+
+include(FetchContent)
+fetchcontent_declare(
+    doctest
+    URL https://raw.githubusercontent.com/doctest/doctest/v2.4.11/doctest/doctest.h
+    DOWNLOAD_NO_EXTRACT TRUE
+)
+fetchcontent_makeavailable(doctest)
+
+add_subdirectory(Source)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
