@@ -59,6 +59,7 @@ TEST_CASE("String move constructor")
     // source теперь пустой, но валидный
     CHECK(source.length() == 0);
     CHECK(std::strcmp(source.c_str(), "") == 0);
+    CHECK_NOTHROW(source.clear());
 }
 
 // ========== “есты операторов ==========

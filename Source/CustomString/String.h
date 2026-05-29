@@ -15,6 +15,7 @@ public:
     String(String&& other) noexcept;
     ~String() noexcept;
 
+    String& operator=(const char* other);
     String& operator=(const String& other);
     String& operator=(String&& other) noexcept;
 
@@ -24,26 +25,33 @@ public:
     char& operator[](size_t index);
     const char& operator[](size_t index) const;
 
-    bool empty() const;
-    size_t length() const;
-    size_t capacity() const;
+    char& at(size_t index);
+    const char& at(size_t index) const;
+
+    bool empty() const noexcept;
+    size_t length() const noexcept;
+    size_t capacity() const noexcept;
 
     const char* c_str() const noexcept;
 
     void shrink_to_fit();
     void reserve(size_t new_capacity);
+    void resize(size_t new_size, char ch);
     void clear();
 
-    char& at(size_t index);
-    const char& at(size_t index) const;
+    void push_back(char ch);
+    void pop_back();
 
     void swap(String& other) noexcept;
 
     void sort(bool(*ptrComparator)(char, char));
+
+    size_t calculate_growth(size_t required) noexcept;
+
 private:
-    char* data_;
-    size_t size_;
-    size_t capacity_;
+    char* data_ = nullptr;
+    size_t size_ = 0;
+    size_t capacity_ = 0;
 
     static constexpr size_t MIN_CAPACITY = 32;
 };

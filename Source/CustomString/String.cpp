@@ -17,7 +17,7 @@ String::String(const char* str)
     if (size_ + 1 < MIN_CAPACITY)
         capacity_ = MIN_CAPACITY;
     else
-        capacity_ = size_ + size_ / 2 + 1;
+        capacity_ = calculate_growth(size_);
 
     data_ = new char[capacity_];
     std::memcpy(data_, str, size_ + 1);
@@ -31,14 +31,22 @@ String::String(const String& other) : size_(other.size_), capacity_(other.capaci
 
 String::String(String&& other) noexcept : data_(other.data_), size_(other.size_), capacity_(other.capacity_)
 {
-    other.data_ = nullptr;
+    other.data_ = new char[MIN_CAPACITY];
+    other.data_[0] = '\0';
     other.size_ = 0;
-    other.capacity_ = 0;
+    other.capacity_ = MIN_CAPACITY;
 }
 
 String::~String() noexcept
 {
     delete[] data_;
+}
+
+String& String::operator=(const char* other)
+{
+    String temp(other);
+    swap(temp);
+    return *this;
 }
 
 String& String::operator=(const String& other)
@@ -68,7 +76,7 @@ String& String::operator+=(const char* other)
     const size_t required_size = size_ + other_size + 1;
     if (capacity_ < required_size)
     {
-        capacity_ = required_size + required_size / 2 + 1;
+        capacity_ = calculate_growth(required_size);
         char* new_data = new char[capacity_];
 
         std::memcpy(new_data, data_, size_);
@@ -115,22 +123,39 @@ void String::reserve(size_t new_capacity)
     capacity_ = new_capacity;
 }
 
-const char* String::c_str() const noexcept
+void String::resize(size_t new_size, char ch)
 {
-    return data_ ? data_ : "";
+    if (size_ == new_size) return;
+
+    if (new_size > size_)
+    {
+        if (new_size + 1 > capacity_)
+        {
+            reserve(new_size + 1);
+        }
+        std::memset(data_ + size_, ch, new_size - size_);
+    }
+
+    size_ = new_size;
+    data_[size_] = '\0';
 }
 
-bool String::empty() const
+const char* String::c_str() const noexcept
+{
+    return data_;
+}
+
+bool String::empty() const noexcept
 {
     return size_ == 0;
 }
 
-size_t String::length() const
+size_t String::length() const noexcept
 {
     return size_;
 }
 
-size_t String::capacity() const
+size_t String::capacity() const noexcept
 {
     return capacity_;
 }
@@ -152,6 +177,22 @@ void String::clear()
 {
     size_ = 0;
     data_[0] = '\0';
+}
+
+void String::push_back(char ch)
+{
+    if (size_ + 1 > capacity_)
+    {
+        reserve(calculate_growth(size_ + 1));
+    }
+
+    data_[size_++] = ch;
+    data_[size_] = '\0';
+}
+
+void String::pop_back()
+{
+    data_[--size_] = '\0';
 }
 
 char& String::at(size_t index)
@@ -182,6 +223,11 @@ void String::sort(bool (*ptrComparator)(char, char))
             }
         }
     }
+}
+
+size_t String::calculate_growth(size_t required) noexcept
+{
+    return required + required / 2 + 1;
 }
 
 }  // namespace exstr
