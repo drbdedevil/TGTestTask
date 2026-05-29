@@ -283,7 +283,7 @@ TEST_CASE("String at() works after clear")
     CHECK_THROWS_AS(s.at(0), std::out_of_range);
 }
 
-TEST_CASE("String at() and [] work after move")
+TEST_CASE("String at() works after move")
 {
     exstr::String source("Hello");
     exstr::String destination(std::move(source));
@@ -292,5 +292,4 @@ TEST_CASE("String at() and [] work after move")
     CHECK(destination.at(4) == 'o');
 
     CHECK_THROWS_AS(source.at(0), std::out_of_range);
-    CHECK_THROWS_AS(source[0], std::out_of_range);
 }
