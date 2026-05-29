@@ -36,7 +36,7 @@ public:
 
     void shrink_to_fit();
     void reserve(size_t new_capacity);
-    void resize(size_t new_size, char ch);
+    void resize(size_t new_size, char ch = '\0');
     void clear();
 
     void push_back(char ch);

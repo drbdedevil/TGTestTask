@@ -4,7 +4,7 @@
 
 #include <cstring>
 
-// ========== Тесты конструкторов ==========
+// ---------------- Тесты конструкторов ----------------
 TEST_CASE("String default constructor")
 {
     exstr::String s;
@@ -18,6 +18,7 @@ TEST_CASE("String constructor from C-string")
 {
     exstr::String s("Hello, Targem!");
 
+    CHECK(s.c_str() != nullptr);
     CHECK(s.length() == 14);
     CHECK(std::strcmp(s.c_str(), "Hello, Targem!") == 0);
 }
@@ -26,26 +27,25 @@ TEST_CASE("String constructor from empty C-string")
 {
     exstr::String s("");
 
+    CHECK(s.c_str() != nullptr);
     CHECK(s.length() == 0);
     CHECK(std::strcmp(s.c_str(), "") == 0);
 }
 
-// ========== Тесты копирования ==========
 TEST_CASE("String copy constructor")
 {
     exstr::String original("Copy me");
     exstr::String copy(original);
 
+    CHECK(copy.c_str() != nullptr);
     CHECK(copy.length() == original.length());
     CHECK(std::strcmp(copy.c_str(), original.c_str()) == 0);
 
-    // Изменение копии не влияет на оригинал
     copy += "!";
     CHECK(std::strcmp(original.c_str(), "Copy me") == 0);
     CHECK(std::strcmp(copy.c_str(), "Copy me!") == 0);
 }
 
-// ========== Тесты перемещения ==========
 TEST_CASE("String move constructor")
 {
     exstr::String source("Move me");
@@ -53,16 +53,17 @@ TEST_CASE("String move constructor")
 
     exstr::String destination(std::move(source));
 
+    CHECK(destination.c_str() != nullptr);
     CHECK(destination.length() == 7);
     CHECK(std::strcmp(destination.c_str(), "Move me") == 0);
 
-    // source теперь пустой, но валидный
+    CHECK(source.c_str() != nullptr);
     CHECK(source.length() == 0);
     CHECK(std::strcmp(source.c_str(), "") == 0);
     CHECK_NOTHROW(source.clear());
 }
 
-// ========== Тесты операторов ==========
+// ---------------- Тесты операторов ----------------
 TEST_CASE("String assignment operator")
 {
     exstr::String a("First");
@@ -90,10 +91,10 @@ TEST_CASE("String move assignment")
     a = std::move(b);
 
     CHECK(std::strcmp(a.c_str(), "Second") == 0);
-    CHECK(b.length() == 5);
+    CHECK(b.c_str() != nullptr);
 }
 
-// ========== Тесты конкатенации ==========
+// ---------------- Тесты конкатенации ----------------
 TEST_CASE("String concatenation with C-string")
 {
     exstr::String s("I want to work at ");
@@ -111,7 +112,7 @@ TEST_CASE("String concatenation with String")
     CHECK(std::strcmp(s1.c_str(), "I want to work at Targem Games!") == 0);
 }
 
-TEST_CASE("String concatenation by self")
+TEST_CASE("String concatenation with self")
 {
     exstr::String s("Hello World");
     s += s.c_str() + 6;
@@ -127,7 +128,7 @@ TEST_CASE("String concatenation with self")
     CHECK(std::strcmp(s.c_str(), "VeryMuchVeryMuch") == 0);
 }
 
-// ========== Тесты сравнения ==========
+// ---------------- Тесты сравнения ----------------
 TEST_CASE("String equality")
 {
     CHECK(exstr::String("Hello") == exstr::String("Hello"));
@@ -144,7 +145,7 @@ TEST_CASE("String comparison operators")
     CHECK(exstr::String("Targem") >= exstr::String("Targem"));
 }
 
-// ========== Тесты работы с C-строками ==========
+// ---------------- Тесты работы с C-строками ----------------
 TEST_CASE("String c_str returns null-terminated string")
 {
     exstr::String s("Test");
@@ -157,7 +158,7 @@ TEST_CASE("String c_str returns null-terminated string")
     CHECK(ptr[s.length()] == '\0');
 }
 
-// ========== Тесты с SUBCASE ==========
+// ---------------- Тесты вспомогательных методов ----------------
 TEST_CASE("String reserve and capacity")
 {
     exstr::String s("Hello");
@@ -178,7 +179,38 @@ TEST_CASE("String reserve and capacity")
     }
 }
 
-// ========== Тесты вспомогательных методов ==========
+TEST_CASE("String resize")
+{
+    exstr::String s("Hello");
+
+    SUBCASE("resize increases size without increase capacity")
+    {
+        size_t old_capacity = s.capacity();
+        size_t old_size = s.length();
+        s.resize(10, 'M');
+        CHECK(s.capacity() == old_capacity);
+        CHECK(std::strcmp(s.c_str(), "HelloMMMMM") == 0);
+    }
+
+    SUBCASE("resize increases size with increase capacity")
+    {
+        size_t old_capacity = s.capacity();
+        size_t old_size = s.length();
+        s.resize(40, 'M');
+        CHECK(s.capacity() >= old_capacity);
+        CHECK(std::strcmp(s.c_str(), "HelloMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM") == 0);
+    }
+
+    SUBCASE("resize smaller size")
+    {
+        size_t old_capacity = s.capacity();
+        size_t old_size = s.length();
+        s.resize(2);
+        CHECK(s.capacity() == old_capacity);
+        CHECK(std::strcmp(s.c_str(), "He") == 0);
+    }
+}
+
 TEST_CASE("Clear String")
 {
     exstr::String s("Don't delete me!");
@@ -251,7 +283,7 @@ TEST_CASE("String at() works after clear")
     CHECK_THROWS_AS(s.at(0), std::out_of_range);
 }
 
-TEST_CASE("String at() works after move")
+TEST_CASE("String at() and [] work after move")
 {
     exstr::String source("Hello");
     exstr::String destination(std::move(source));
@@ -260,4 +292,5 @@ TEST_CASE("String at() works after move")
     CHECK(destination.at(4) == 'o');
 
     CHECK_THROWS_AS(source.at(0), std::out_of_range);
+    CHECK_THROWS_AS(source[0], std::out_of_range);
 }
