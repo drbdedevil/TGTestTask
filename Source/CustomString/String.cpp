@@ -227,7 +227,7 @@ void String::sort(bool (*ptrComparator)(char, char))
 
 size_t String::calculate_growth(size_t required) noexcept
 {
-    return required + required / 2 + 1;
+    return required + required / GROW_COEFFICIENT + 1;
 }
 
 }  // namespace exstr

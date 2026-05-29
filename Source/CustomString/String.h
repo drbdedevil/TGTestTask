@@ -46,6 +46,7 @@ public:
 
     void sort(bool(*ptrComparator)(char, char));
 
+private:
     size_t calculate_growth(size_t required) noexcept;
 
 private:
@@ -54,6 +55,7 @@ private:
     size_t capacity_ = 0;
 
     static constexpr size_t MIN_CAPACITY = 32;
+    static constexpr size_t GROW_COEFFICIENT = 2;
 };
 
 inline void String::swap(String& other) noexcept

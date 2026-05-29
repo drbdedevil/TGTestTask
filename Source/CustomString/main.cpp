@@ -49,9 +49,7 @@ int main(int argc, char* argv[])
 
     std::cout << "\nResult:" << std::endl;
     for (size_t i = 0; i < argStrings.size(); ++i)
-    {
         std::cout << argStrings[i] << std::endl;
-    }
 
     return 0;
 }
